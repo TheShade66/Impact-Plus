@@ -1,0 +1,4 @@
+//<'impact.pbo' properties via Mikero's dos tools, dll version 8.35>
+prefix=impact;
+//PboType=Arma Addon;
+//</properties>
