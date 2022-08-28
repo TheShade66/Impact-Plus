@@ -16,9 +16,11 @@ if (_impact) then {
 	_hitvalue = (_ammo select !_isDirect) min 12.5;	//RANGES FROM 5 to 12.5
 	_hitveloratio = _hitvalue/([100,vectorMagnitude _velocity] select _isDirect); //invert of distance, doubles to 500m
 	_mass = _hitveloratio * _hitvalue * _radius*10 * (count _selection);  //ranges between 0.4 to 2
+	
+	//hint str _hitvalue;
 
-	//_coef = missionNamespace getVariable ["impactCoef", 1];	//replace with cba?
-	//if (random 1 > _mass*_coef) exitWith {};
+	_coef = missionNamespace getVariable ["impactCoef", 1.9];	//replace with cba?
+	if (random [4, 5.2, 7.9] > _hitvalue) exitWith {};
 
 	_hitpos = _target selectionPosition (_selection # 0);
 	_impact_vector = _velocity;
@@ -30,22 +32,24 @@ if (_impact) then {
 		_impact_vector = _posASL vectorFromTo _hitpos_world;
 	};
 	
-	_force = _impact_vector vectorMultiply _mass*0.8;
+	_force = _impact_vector vectorMultiply _mass*_coef;
 
 	_target addForce [_force, _hitpos];
-
+	if isPlayer _target then {
+			[0,"BLACK",1,1] call BIS_fnc_fadeEffect;
+			sleep 1;
+			[1,"BLACK",3,1] call BIS_fnc_fadeEffect; 
+			_target spawn {
+				sleep (random [3, 5, 9]);
+				if (alive _this) then {
+				_this setUnconscious false
+			}
+		};
+	};
 	_target spawn {
-	//	[0,"BLACK",1,1] call BIS_fnc_fadeEffect;
-		sleep (random [2, 5, 12]);
+		sleep (random [4, 5, 12]);
 			if (alive _this) then {
-	//		[1,"BLACK",1,1] call BIS_fnc_fadeEffect; 
 			_this setUnconscious false
 			}
 	};
-
-
-//		_sleeptime=((random [2, 5, 12]));
-//		hint str _sleeptime;
-//		sleep _sleeptime;
-
 };
