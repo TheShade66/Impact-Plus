@@ -37,11 +37,11 @@ if (_impact) then {
 	_target addForce [_force, _hitpos];
 	if isPlayer _target then {
 			[0,"BLACK",1,1] call BIS_fnc_fadeEffect;
-			sleep 1;
 			[1,"BLACK",3,1] call BIS_fnc_fadeEffect; 
 			_target spawn {
 				sleep (random [3, 5, 9]);
 				if (alive _this) then {
+				[1,"BLACK",3,1] call BIS_fnc_fadeEffect; 
 				_this setUnconscious false
 			}
 		};
