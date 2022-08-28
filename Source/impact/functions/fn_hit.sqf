@@ -2,7 +2,7 @@
 _abort_evals = [
 	{!alive _target},
 	{vehicle _target isNotEqualTo _target},
-	//{isPlayer _target && {!(missionNamespace getVariable ["impactForcedOn_player", false])}},		now disabled on player
+	//{isPlayer _target && {!(missionNamespace getVariable ["impactForcedOn_player", false])}},		now ENABLED on player
 	//{_target isKindOf "zombie" && {!(missionNamespace getVariable [("impactForcedOn_" + typeOf _target), false])}},//impactForcedOn_zombie_walker = true;
 	//{_target isKindOf "UAV_AI_base_F" && {!(missionNamespace getVariable [("impactForcedOn_" + typeOf _target), false])}},
 	{(missionNamespace getVariable ["impactDisabledOn_" + typeOf _target, false])},
@@ -10,16 +10,15 @@ _abort_evals = [
 ];
 if (_abort_evals findIf {call _x} isNotEqualTo -1) exitWith {};
 
-
 _radius_threshold = [0.1, 0.15] select _isDirect;
 _impact = (_ammo # 0) > 1 && _radius > _radius_threshold && {vectorMagnitude _velocity > 100 || (_ammo # 1) > 0};
 if (_impact) then {
-	_hitvalue = (_ammo select !_isDirect) min 12.5;
-	_hitveloratio = _hitvalue/([100,vectorMagnitude _velocity] select _isDirect);
-	_mass = _hitveloratio * _hitvalue * _radius*10 * (count _selection);
+	_hitvalue = (_ammo select !_isDirect) min 12.5;	//RANGES FROM 5 to 12.5
+	_hitveloratio = _hitvalue/([100,vectorMagnitude _velocity] select _isDirect); //invert of distance, doubles to 500m
+	_mass = _hitveloratio * _hitvalue * _radius*10 * (count _selection);  //ranges between 0.4 to 2
 
-	_coef = missionNamespace getVariable ["impactCoef", 1];
-	if (random 1 > _mass*_coef) exitWith {};
+	//_coef = missionNamespace getVariable ["impactCoef", 1];	//replace with cba?
+	//if (random 1 > _mass*_coef) exitWith {};
 
 	_hitpos = _target selectionPosition (_selection # 0);
 	_impact_vector = _velocity;
@@ -30,17 +29,23 @@ if (_impact) then {
 		_posASL = _hitpos_world vectorAdd _vector_offset;
 		_impact_vector = _posASL vectorFromTo _hitpos_world;
 	};
+	
+	_force = _impact_vector vectorMultiply _mass*0.8;
 
-	/*i_debug = "Sign_Sphere25cm_F" createVehicleLocal [0,0,0];
-	i_debug setPosASL _posASL;
-	i_debug spawn {sleep 5; deleteVehicle _this};*/
-
-	_force = _impact_vector vectorMultiply _mass;
 	_target addForce [_force, _hitpos];
+
 	_target spawn {
-		sleep 5;
-		if (alive _this) then {
+	//	[0,"BLACK",1,1] call BIS_fnc_fadeEffect;
+		sleep (random [2, 5, 12]);
+			if (alive _this) then {
+	//		[1,"BLACK",1,1] call BIS_fnc_fadeEffect; 
 			_this setUnconscious false
-		}
+			}
 	};
+
+
+//		_sleeptime=((random [2, 5, 12]));
+//		hint str _sleeptime;
+//		sleep _sleeptime;
+
 };
