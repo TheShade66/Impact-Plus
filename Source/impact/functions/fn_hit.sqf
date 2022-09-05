@@ -34,7 +34,7 @@ if (_impact) then {
 	
 	_force = _impact_vector vectorMultiply _mass*_coef;
 
-	_target addForce [_force, _hitpos];
+	[_target, [_force, _hitpos]] remoteExec ["addForce", 0];
 	if isPlayer _target then {
 		[0,"BLACK",1,1] remoteExec ["BIS_fnc_fadeEffect", _target];
 		[0,"BLACK",1,1] remoteExec ["BIS_fnc_fadeEffect", _target];
@@ -42,14 +42,14 @@ if (_impact) then {
 				sleep (random [3, 5, 9]);
 				if (alive _this) then {
 				[1,"BLACK",3,1] remoteExec ["BIS_fnc_fadeEffect", _this];
-				_this setUnconscious false
+				[_this, false] remoteExec ["setUnconscious", 0];
 			}
 		};
 	};
 	_target spawn {
 		sleep (random [4, 5, 12]);
 			if (alive _this) then {
-			_this setUnconscious false
+			[_this, false] remoteExec ["setUnconscious", 0];
 			}
 	};
 };
